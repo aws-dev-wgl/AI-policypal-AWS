@@ -1,69 +1,28 @@
-# Role Bedrock uses to read S3 and manage its vector store
-data "aws_iam_policy_document" "kb_trust" {
-  statement {
-    actions = ["sts:AssumeRole"]
+module "bedrock_kb" {
+  source  = "aws-ia/bedrock/aws"
+  version = "~> 1.8" # or latest shown on the registry
 
-    principals {
-      type        = "Service"
-      identifiers = ["bedrock.amazonaws.com"]
-    }
-  }
-}
+  # Create default OpenSearch Serverless KB + index
+  create_default_kb = true
 
-resource "aws_iam_role" "kb" {
-  name               = "${local.name_prefix}-kb-role"
-  assume_role_policy = data.aws_iam_policy_document.kb_trust.json
-}
-
-data "aws_iam_policy_document" "kb_policy_doc" {
-  statement {
-    actions = ["s3:GetObject", "s3:ListBucket"]
-    resources = [
-      aws_s3_bucket.docs.arn,
-      "${aws_s3_bucket.docs.arn}/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "kb_policy" {
-  name   = "${local.name_prefix}-kb-policy"
-  policy = data.aws_iam_policy_document.kb_policy_doc.json
-}
-
-resource "aws_iam_role_policy_attachment" "kb_attach" {
-  role       = aws_iam_role.kb.name
-  policy_arn = aws_iam_policy.kb_policy.arn
-}
-
-resource "aws_bedrockagent_knowledge_base" "kb" {
-  name        = "${local.name_prefix}-kb"
-  description = "PolicyPal Knowledge Base"
-  role_arn    = aws_iam_role.kb.arn
-
-  knowledge_base_configuration {
-    type = "VECTOR"
-
-    vector_knowledge_base_configuration {
-      embedding_model_arn = "arn:aws:bedrock:${var.region}::foundation-model/amazon.titan-embed-text-v2"
-    }
+  # S3 data source
+  create_s3_data_source = true
+  s3_data_source = {
+    bucket_name        = aws_s3_bucket.docs.bucket
+    inclusion_prefixes = ["corpus/"]
   }
 
-  storage_configuration {
-    type = "AMAZON_MANAGED"
-  }
+  # Embedding model for vectorization
+  embedding_model_id = "amazon.titan-embed-text-v2"
+
+  # Tags / naming context
+  name_prefix = local.name_prefix
 }
 
-resource "aws_bedrockagent_data_source" "s3src" {
-  knowledge_base_id = aws_bedrockagent_knowledge_base.kb.id
-  name              = "${local.name_prefix}-s3src"
-  description       = "Docs bucket data source"
-
-  data_source_configuration {
-    type = "S3"
-
-    s3_configuration {
-      bucket_arn         = aws_s3_bucket.docs.arn
-      inclusion_prefixes = ["corpus/"]
-    }
-  }
+# expose outputs similar to what you had before
+output "kb_id" {
+  value = module.bedrock_kb.knowledge_base_id
+}
+output "kb_data_source_id" {
+  value = module.bedrock_kb.data_source_id
 }
