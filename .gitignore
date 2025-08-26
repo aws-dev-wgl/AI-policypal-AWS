@@ -28,3 +28,72 @@ terraform.tfvars
 .env
 .env.*
 
+# =========================
+# Terraform
+# =========================
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform plan files
+*.plan
+
+# Local env vars
+.env
+.env.*
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.zip
+*.tar.gz
+venv/
+.venv/
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+
+# =========================
+# Node/Web
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+build/
+.DS_Store
+
+# =========================
+# VSCode / IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS files
+# =========================
+Thumbs.db
+.DS_Store
+
