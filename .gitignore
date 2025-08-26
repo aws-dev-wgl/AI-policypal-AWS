@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Node/Web
+node_modules/
+dist/
+build/
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# AWS/TF
+*.tfstate
+*.tfstate.*
+.terraform/
+terraform.tfvars
+*.zip
+
+# Env
+.env
+.env.*
+
