@@ -1,5 +1,32 @@
 # file: bedrock_kb.tf
 
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+    opensearch = {
+      source  = "opensearch-project/opensearch"
+      version = "~> 2.3"
+    }
+    awscc = {
+      source  = "hashicorp/awscc"
+      version = ">= 1.0.0"
+    }
+  }
+}
+
+# Provider for OpenSearch used by the submodule to create the vector index
+# NOTE: url comes from the collection this module creates; healthcheck is disabled
+# to avoid plan-time HEAD checks before the collection exists.
+provider "opensearch" {
+  url         = module.bedrock_kb.default_collection.collection_endpoint
+  healthcheck = false
+}
+
+# file: bedrock_kb.tf
+
 # Region is needed to build the Titan v2 model ARN
 data "aws_region" "current" {}
 
